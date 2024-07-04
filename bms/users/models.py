@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 from .manager import UserManager
+from django.utils import timezone
 
 
 class Users(AbstractBaseUser):
@@ -13,6 +14,7 @@ class Users(AbstractBaseUser):
     is_owner = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_employee = models.BooleanField(default=True)
+    created_at = models.DateField(default=timezone.now)
 
     objects = UserManager()
     
