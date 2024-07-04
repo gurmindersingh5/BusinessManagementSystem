@@ -1,10 +1,13 @@
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth import get_user_model, authenticate
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny, IsAuthenticated
+# from rest_framework.authentication import TokenAuthentication
 
-from .serializers import UsersSerializer
+from .serializers import UsersSerializer, LoginSerializer
 
 """
 in Django, when using class-based views (CBVs) such as those provided by Django REST 
@@ -16,6 +19,7 @@ methods in Flask with methods=['GET', 'POST'].
 User = get_user_model() # Users obj to deal with Users Model
 
 class Register(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         try:
             username = request.GET.get('username')
@@ -63,11 +67,34 @@ class Register(APIView):
 
 
 class GetUsers(APIView):
-    def get(self):
-        users = User.objects.all()
-        # this gives a query set like this, so we use built-in serializer to process it.
-        # <QuerySet [Username: firstuser, Email: firstuser@gmail.com, is_active: True is_Owner: True, is_employee: True]>
-        # Serializers allow complex data such as querysets and model instances to be converted to native Python datatypes.
-        serializer = UsersSerializer(users, many=True)
-        return Response(serializer.data)
+    permission_classes = [IsAuthenticated]
+    def get(self, request, slug=None):
+        if slug is not None:
+            user = get_object_or_404(User, id=slug)
+            serializer = UsersSerializer(user)
+            return Response(serializer.data)
+        else:
+            users = User.objects.all()
+            # this gives a query set like this, so we use built-in serializer to process it.
+            # <QuerySet [Username: firstuser, Email: firstuser@gmail.com, is_active: True is_Owner: True, is_employee: True]>
+            # Serializers allow complex data such as querysets and model instances to be converted to native Python datatypes.
+            serializer = UsersSerializer(users, many=True)
+            return Response(serializer.data)
+
+
+# class Login(APIView):
+#     def post(self, request):
+#         serializer = LoginSerializer(data=request.data)
+#         if serializer.is_valid():
+#             username = serializer.validated_data['username']
+#             password = serializer.validated_data['password']
+#             user = authenticate(username=username, password=password)
+#             if user is not None:
+#                 print('----++---',user)
+#                 token, created = Token.objects.get_or_create(user=user)
+#                 return Response({'token':token.key}, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+        
 

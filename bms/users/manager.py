@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
         
         # 'passkey' is '1300' for creating owner/superuser
         if owner_passkey != '1300':
-            raise ValueError('Wrong initial passkey/password to create OWNER USER')
+            raise ValueError('Wrong passkey/password to create OWNER USER')
         
         return self.create_user(username, email, password, **extras)
         
