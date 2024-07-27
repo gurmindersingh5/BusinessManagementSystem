@@ -4,10 +4,12 @@
 
 import os
 import pytest
+import django
+
 from django.core.management import call_command
 from django.db import connection
 from django.contrib.auth import get_user_model
-import django
+
 
 # Ensure that Django is setup correctly before running tests
 os.environ['DJANGO_SETTINGS_MODULE'] = 'bms.settings'
