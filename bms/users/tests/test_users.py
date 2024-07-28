@@ -97,13 +97,16 @@ def test_create_user():
 """
 import os
 import unittest
+
 from django.conf import settings
 from django.db import connection, transaction
 from django.contrib.auth import get_user_model
 
+
 class UserModelTests(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUp(cls):
         os.environ['DJANGO_SETTINGS_MODULE'] = 'bms.settings'
         settings.DEBUG = False
         with connection.cursor() as cursor:
